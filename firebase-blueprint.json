@@ -1,0 +1,72 @@
+{
+  "entities": {
+    "Assignment": {
+      "title": "Assignment",
+      "description": "Student assignment submission",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "studentName": { "type": "string" },
+        "status": { "type": "string", "enum": ["submitted", "graded", "pending"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "studentName", "status", "createdAt"]
+    },
+    "PlaneTicket": {
+      "title": "Plane Ticket",
+      "description": "Airline booking",
+      "type": "object",
+      "properties": {
+        "flightNumber": { "type": "string" },
+        "seatNumber": { "type": "string" },
+        "passengerName": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["flightNumber", "seatNumber", "passengerName", "userId", "createdAt"]
+    },
+    "MovieTicket": {
+      "title": "Movie Ticket",
+      "description": "Cinema booking",
+      "type": "object",
+      "properties": {
+        "movieTitle": { "type": "string" },
+        "seatNumber": { "type": "string" },
+        "passengerName": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["movieTitle", "seatNumber", "passengerName", "userId", "createdAt"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "Application user role and details",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "name": { "type": "string" }
+      },
+      "required": ["email", "role", "name"]
+    }
+  },
+  "firestore": {
+    "assignments": {
+      "schema": "Assignment",
+      "description": "Collection of student assignments"
+    },
+    "plane_tickets": {
+      "schema": "PlaneTicket",
+      "description": "Collection of airline seat bookings"
+    },
+    "movie_tickets": {
+      "schema": "MovieTicket",
+      "description": "Collection of cinema seat bookings"
+    },
+    "users": {
+      "schema": "User",
+      "description": "Collection of user roles and profiles"
+    }
+  }
+}

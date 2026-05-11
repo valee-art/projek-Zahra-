@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global helpers
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128; }
+    function isAdmin() { 
+      return isSignedIn() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; 
+    }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+
+    // Assignments
+    match /assignments/{assignmentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && 
+                      request.resource.data.keys().hasAll(['title', 'studentName', 'status', 'createdAt']) &&
+                      request.resource.data.status in ['submitted', 'graded', 'pending'];
+      allow update, delete: if isAdmin();
+    }
+
+    // Plane Tickets
+    match /plane_tickets/{ticketId} {
+      allow read: if isSignedIn() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Movie Tickets
+    match /movie_tickets/{ticketId} {
+      allow read: if isSignedIn() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // User Profiles
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isAdmin() || request.auth.uid == userId);
+      // Izinkan registrasi jika user baru (tanpa admin check untuk role 'user')
+      allow create: if isSignedIn() && request.auth.uid == userId && request.resource.data.role in ['user', 'admin'];
+      allow update: if isAdmin() || (isSignedIn() && request.auth.uid == userId && request.resource.data.role == resource.data.role);
+      allow delete: if isAdmin();
+    }
+  }
+}
