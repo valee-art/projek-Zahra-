@@ -36,7 +36,7 @@ export default function ProjectTugas({ profile }: ProjectTugasProps) {
       await addDoc(collection(db, 'assignments'), {
         title,
         description,
-        studentName: profile.name,
+        studentName: profile?.name || 'Anonymous',
         status: 'pending',
         createdAt: new Date().toISOString()
       });

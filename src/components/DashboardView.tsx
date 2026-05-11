@@ -25,7 +25,7 @@ export default function DashboardView({ profile }: DashboardViewProps) {
     <div className="space-y-8">
       <header>
         <h1 className="text-4xl font-bold tracking-tight mb-2">
-          Selamat Datang, <span className="text-[#00a8ff]">{profile.name}</span>
+          Selamat Datang, <span className="text-[#00a8ff]">{profile?.name || 'Guest'}</span>
         </h1>
         <p className="text-white/50">Overview sistem global dan statistik performa anda hari ini.</p>
       </header>

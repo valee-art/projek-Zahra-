@@ -10,6 +10,7 @@ import ProjectPesawat from './components/ProjectPesawat';
 import ProjectBioskop from './components/ProjectBioskop';
 import { UserProfile, MenuType } from './types';
 import { motion, AnimatePresence } from 'motion/react';
+import { Settings } from 'lucide-react';
 
 // Enhanced Error Handler
 enum OperationType {
@@ -54,28 +55,48 @@ export default function App() {
           
           if (userSnap.exists()) {
             setProfile({ uid: user.uid, ...userSnap.data() } as UserProfile);
+            setLoading(false);
           } else {
-            const newProfile: UserProfile = {
-              uid: user.uid,
-              email: user.email || '',
-              name: user.email?.split('@')[0] || 'Guest',
-              role: 'user'
-            };
-            await setDoc(userRef, {
-              email: newProfile.email,
-              name: newProfile.name,
-              role: newProfile.role
-            });
-            setProfile(newProfile);
+            // Document might be being created by Login.tsx
+            // We'll give it a moment or just set a temporary loading profile
+            console.log("Profile doc not found yet, waiting...");
+            // Optionally we can set a fallback if it doesn't appear in 2 seconds
+            setTimeout(async () => {
+              try {
+                const retrySnap = await getDoc(userRef);
+                if (retrySnap.exists()) {
+                  setProfile({ uid: user.uid, ...retrySnap.data() } as UserProfile);
+                } else {
+                  // If still not there, create it from App
+                  const newProfile: UserProfile = {
+                    uid: user.uid,
+                    email: user.email || '',
+                    name: user.email?.split('@')[0] || 'Guest',
+                    role: 'user'
+                  };
+                  await setDoc(userRef, {
+                    email: newProfile.email,
+                    name: newProfile.name,
+                    role: newProfile.role
+                  });
+                  setProfile(newProfile);
+                }
+              } catch (err) {
+                console.error("Retry profile load failed:", err);
+              } finally {
+                setLoading(false);
+              }
+            }, 1500);
           }
         } catch (err) {
           const errMsg = handleFirestoreError(err, OperationType.GET, `users/${user.uid}`);
           setError(`Gagal memuat profil: ${errMsg}`);
+          setLoading(false);
         }
       } else {
         setProfile(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -116,13 +137,23 @@ export default function App() {
   const renderContent = () => {
     switch (activeMenu) {
       case 'dashboard':
+      case 'stats':
         return <DashboardView profile={profile!} />;
       case 'tugas':
+      case 'database':
         return <ProjectTugas profile={profile!} />;
       case 'pesawat':
         return <ProjectPesawat profile={profile!} />;
       case 'bioskop':
         return <ProjectBioskop profile={profile!} />;
+      case 'settings':
+        return (
+          <div className="bg-white/5 border border-white/10 p-12 rounded-[32px] text-center">
+            <Settings className="w-16 h-16 text-[#00a8ff] mx-auto mb-6 animate-spin-slow" />
+            <h2 className="text-2xl font-black mb-4">SYSTEM PREFERENCES</h2>
+            <p className="text-white/40 max-w-md mx-auto">Modul pengaturan sistem sedang dalam tahap enkripsi. Silakan kembali lagi nanti untuk penyesuaian parameter mendalam.</p>
+          </div>
+        );
       default:
         return <DashboardView profile={profile!} />;
     }

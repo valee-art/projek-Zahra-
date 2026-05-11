@@ -11,6 +11,7 @@ service cloud.firestore {
     function isValidId(id) { return id is string && id.size() <= 128; }
     function isAdmin() { 
       return isSignedIn() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; 
     }
     function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }

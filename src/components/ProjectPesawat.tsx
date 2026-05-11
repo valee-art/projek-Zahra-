@@ -16,7 +16,7 @@ export default function ProjectPesawat({ profile }: ProjectPesawatProps) {
   const [manifest, setManifest] = useState<PlaneTicket[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const isAdmin = profile.role === 'admin';
+  const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
     const q = collection(db, 'plane_tickets');
@@ -36,8 +36,8 @@ export default function ProjectPesawat({ profile }: ProjectPesawatProps) {
       await addDoc(collection(db, 'plane_tickets'), {
         flightNumber: 'GA-101',
         seatNumber: selectedSeat,
-        passengerName: profile.name,
-        userId: profile.uid,
+        passengerName: profile?.name || 'Anonymous',
+        userId: profile?.uid || '',
         createdAt: new Date().toISOString()
       });
       setSelectedSeat(null);

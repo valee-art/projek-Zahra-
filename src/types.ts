@@ -34,4 +34,4 @@ export interface MovieTicket {
   createdAt: string;
 }
 
-export type MenuType = 'dashboard' | 'tugas' | 'pesawat' | 'bioskop';
+export type MenuType = 'dashboard' | 'tugas' | 'pesawat' | 'bioskop' | 'stats' | 'database' | 'settings';

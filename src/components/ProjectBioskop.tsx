@@ -17,7 +17,7 @@ export default function ProjectBioskop({ profile }: ProjectBioskopProps) {
   const [loading, setLoading] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState('Avengers: Doomsday');
 
-  const isAdmin = profile.role === 'admin';
+  const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
     const q = collection(db, 'movie_tickets');
@@ -37,8 +37,8 @@ export default function ProjectBioskop({ profile }: ProjectBioskopProps) {
       await addDoc(collection(db, 'movie_tickets'), {
         movieTitle: selectedMovie,
         seatNumber: selectedSeat,
-        passengerName: profile.name,
-        userId: profile.uid,
+        passengerName: profile?.name || 'Anonymous',
+        userId: profile?.uid || '',
         createdAt: new Date().toISOString()
       });
       setSelectedSeat(null);
@@ -191,7 +191,7 @@ export default function ProjectBioskop({ profile }: ProjectBioskopProps) {
                              <p className="text-[10px] text-[#00a8ff] font-bold uppercase truncate">{s.movieTitle}</p>
                              <div className="flex justify-between items-end mt-1">
                                 <span className="font-bold text-white text-lg">{s.seatNumber}</span>
-                                <span className="text-[8px] text-white/20">{s.passengerName.split(' ')[0]}</span>
+                                <span className="text-[8px] text-white/20">{(s.passengerName || 'Guest').split(' ')[0]}</span>
                              </div>
                           </div>
                         ))}
